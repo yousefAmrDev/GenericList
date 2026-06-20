@@ -1,0 +1,26 @@
+# Visual Studio cache files
+.vs/
+
+# Build output
+bin/
+obj/
+
+# User-specific files
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Visual Studio Code (لو استخدمته)
+.vscode/
+
+# Logs
+*.log
+
+# NuGet packages (اختياري لو مش عايز ترفعها)
+*.nupkg
+packages/
+
+# OS files
+.DS_Store
+Thumbs.db

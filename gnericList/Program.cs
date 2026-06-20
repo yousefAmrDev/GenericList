@@ -1,0 +1,33 @@
+﻿using System;
+using System.Collections.Generic;
+
+namespace gnericList
+{
+    internal class Program
+    {
+        static void Main(string[] args)
+        {
+            MyList<string> oList = new MyList<string>();
+
+            Console.WriteLine(oList.Count);
+            Console.WriteLine(oList.Capacity);
+            oList.Add("yousef");
+            oList.Add("mo");
+            oList.Add("Ah");
+            oList.Add("Ali");
+            oList.Add("dd");
+            oList.Add("jjj");
+
+
+            oList[0] = "yousef";
+            oList[1] = "mohamed";
+            oList[2] = "Ahmed";
+            oList[100] = "Ahmed";
+
+            Console.WriteLine(oList.Count);
+            Console.WriteLine(oList.Capacity);
+            List<string> lst = oList["0,1,2"];
+
+        }
+    }
+}
