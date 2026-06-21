@@ -124,6 +124,21 @@ namespace gnericList
             }
             return -1;
         }
+
+        public void Remove(T item)
+        {
+            int index = IndexOf(item);
+
+            if (index == -1)
+                return;
+
+            ShiftingToLeft(index);
+
+            Count--;
+            currentIndex--;
+
+            items[Count] = default(T);
+        }
         #endregion
 
 

@@ -31,9 +31,15 @@ namespace gnericList
             //oList.RemoveAt(0);
             //oList.RemoveAt(5);
 
-            oList.IndexOf("Ah");
-            oList.IndexOf("jjj");
-            oList.IndexOf("yousef");
+            //oList.IndexOf("Ah");
+            //oList.IndexOf("jjj");
+            //oList.IndexOf("yousef");
+
+            oList.Remove("yousef");
+            oList.Remove("dd");
+            oList.Remove("jjj");
+
+
 
 
         }
