@@ -27,9 +27,13 @@ namespace gnericList
             //Console.WriteLine(oList.Capacity);
             //List<string> lst = oList["0,1,2"];
 
-            oList.RemoveAt(1);
-            oList.RemoveAt(0);
-            oList.RemoveAt(5);
+            //oList.RemoveAt(1);
+            //oList.RemoveAt(0);
+            //oList.RemoveAt(5);
+
+            oList.IndexOf("Ah");
+            oList.IndexOf("jjj");
+            oList.IndexOf("yousef");
 
 
         }

@@ -6,7 +6,7 @@ namespace gnericList
     public class MyList<T>
     {
         #region fildes$proprties
-        public T[] items;
+        private T[] items;
         public int Count { get; private set; }
         public int Capacity
         {
@@ -99,20 +99,31 @@ namespace gnericList
 
         void ShiftingToLeft(int index)
         {
-            for (int i = index; i < items.Length - 1; i++)
+            for (int i = index; i < currentIndex - 1; i++)
             {
+
                 items[i] = items[i + 1];
             }
         }
         public void RemoveAt(int index)
         {
-            if (index < 0 || index > currentIndex)
+            if (index < 0 || index >= currentIndex)
                 throw new ArgumentOutOfRangeException(nameof(index));
             ShiftingToLeft(index);
             Count--;
             currentIndex--;
+            items[Count] = default(T);
         }
 
+        public int IndexOf(T item)
+        {
+            for (int i = 0; i < currentIndex; i++)
+            {
+                if (EqualityComparer<T>.Default.Equals(items[i], item))
+                    return i;
+            }
+            return -1;
+        }
         #endregion
 
 
