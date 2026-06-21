@@ -125,12 +125,12 @@ namespace gnericList
             return -1;
         }
 
-        public void Remove(T item)
+        public bool Remove(T item)
         {
             int index = IndexOf(item);
 
             if (index == -1)
-                return;
+                return false;
 
             ShiftingToLeft(index);
 
@@ -138,6 +138,22 @@ namespace gnericList
             currentIndex--;
 
             items[Count] = default(T);
+            return true;
+        }
+
+        public void AddRenge(T[] elements)
+        {
+            int temp = 0;
+            while (Count + elements.Length > items.Length)
+            {
+                Resize(items);
+            }
+
+            for (int i = Count; i < Count + elements.Length; i++)
+            {
+                items[i] = elements[temp];
+                temp++;
+            }
         }
         #endregion
 
