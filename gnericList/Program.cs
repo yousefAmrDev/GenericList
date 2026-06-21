@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 
 namespace gnericList
 {
@@ -19,14 +18,19 @@ namespace gnericList
             oList.Add("jjj");
 
 
-            oList[0] = "yousef";
-            oList[1] = "mohamed";
-            oList[2] = "Ahmed";
-            oList[100] = "Ahmed";
+            //oList[0] = "yousef";
+            //oList[1] = "mohamed";
+            //oList[2] = "Ahmed";
+            //oList[100] = "Ahmed";
 
-            Console.WriteLine(oList.Count);
-            Console.WriteLine(oList.Capacity);
-            List<string> lst = oList["0,1,2"];
+            //Console.WriteLine(oList.Count);
+            //Console.WriteLine(oList.Capacity);
+            //List<string> lst = oList["0,1,2"];
+
+            oList.RemoveAt(1);
+            oList.RemoveAt(0);
+            oList.RemoveAt(5);
+
 
         }
     }

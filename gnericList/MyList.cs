@@ -97,6 +97,25 @@ namespace gnericList
 
         }
 
+        void ShiftingToLeft(int index)
+        {
+            for (int i = index; i < items.Length - 1; i++)
+            {
+                items[i] = items[i + 1];
+            }
+        }
+        public void RemoveAt(int index)
+        {
+            if (index < 0 || index > currentIndex)
+                throw new ArgumentOutOfRangeException(nameof(index));
+            ShiftingToLeft(index);
+            Count--;
+            currentIndex--;
+        }
+
         #endregion
+
+
+
     }
 }
