@@ -1,10 +1,11 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace gnericList
 {
-    public class MyList<T>
+    public class MyList<T> : IEnumerable<T>
     {
         #region fildes$proprties
         private T[] items;
@@ -273,6 +274,19 @@ namespace gnericList
             {
                 items[i] = reversed[i];
             }
+        }
+
+        public IEnumerator<T> GetEnumerator()
+        {
+            foreach (T item in items)
+            {
+                yield return item;
+            }
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
         }
         #endregion
 
