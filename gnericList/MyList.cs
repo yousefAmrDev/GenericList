@@ -1,235 +1,148 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 
-namespace gnericList
+namespace GenericList
 {
     public class MyList<T> : IEnumerable<T>
     {
-        #region fildes$proprties
+        #region Fields & Properties
+
+        // Internal array used to store list elements dynamically
         private T[] items;
+
+        // Represents the actual number of stored elements
         public int Count { get; private set; }
-        public int Capacity
-        {
-            get { return items.Length; }
-        }
-        private int currentIndex;
+
+        // Represents the current allocated array size
+        public int Capacity => items.Length;
 
         #endregion
 
-        #region Costructors
+        #region Constructors
+
+        // Initializes the list with default capacity
         public MyList() : this(4)
         {
         }
-        public MyList(int capasity)
+
+        // Initializes the list with custom capacity
+        public MyList(int capacity)
         {
-            items = new T[capasity];
+            if (capacity < 0)
+                throw new ArgumentOutOfRangeException(nameof(capacity));
+
+            items = new T[capacity];
             Count = 0;
-            currentIndex = 0;
         }
+
         #endregion
 
-        #region indexers
+        #region Indexers
+
+        // Provides direct access to elements using index
         public T this[int index]
         {
-            set
-            {
-                if (index < 0 || index >= currentIndex)
-                    throw new IndexOutOfRangeException();
-                items[index] = value;
-
-            }
             get
             {
-                if (index < 0 || index >= currentIndex)
-                    throw new IndexOutOfRangeException();
+                ValidateIndex(index);
                 return items[index];
             }
+
+            set
+            {
+                ValidateIndex(index);
+                items[index] = value;
+            }
         }
+
+        // Returns multiple elements using comma-separated indexes
         public List<T> this[string indexes]
         {
             get
             {
-                if (string.IsNullOrEmpty(indexes))
-                    throw new IndexOutOfRangeException();
+                if (string.IsNullOrWhiteSpace(indexes))
+                    throw new ArgumentException("Indexes string cannot be empty.");
 
                 string[] indexesArray = indexes.Split(',');
 
-                List<T> list = new List<T>();
+                List<T> result = new List<T>();
 
-                foreach (string index in indexesArray)
+                foreach (string indexText in indexesArray)
                 {
-                    if (Convert.ToInt32(index) < 0 || Convert.ToInt32(index) >= Count)
+                    if (!int.TryParse(indexText, out int index))
                         continue;
 
-                    if (items[Convert.ToInt32(index)] == null)
+                    if (index < 0 || index >= Count)
                         continue;
 
-                    list.Add(items[Convert.ToInt32(index)]);
-
+                    result.Add(items[index]);
                 }
-                return list;
 
+                return result;
             }
         }
 
         #endregion
 
-        #region Methodes
-        private T[] Resize(T[] Arr)
-        {
-            int l = Arr.Length * 2;
-            T[] Arr2 = new T[l];
-            for (int i = 0; i < Arr.Length; i++)
-            {
-                Arr2[i] = Arr[i];
-            }
+        #region Core Add Operations
 
-            return Arr2;
-        }
-        private void ResizeTo(int requiredCapacity)
-        {
-            if (items.Length >= requiredCapacity)
-                return;
-
-            T[] newArr = new T[requiredCapacity];
-
-            for (int i = 0; i < items.Length; i++)
-            {
-                newArr[i] = items[i];
-            }
-
-            items = newArr;
-        }
+        // Adds a new element to the end of the list
         public void Add(T item)
         {
-            if (currentIndex >= items.Length)
-                items = Resize(items);
+            EnsureCapacity(Count + 1);
 
-            items[currentIndex] = item;
-            currentIndex++;
+            items[Count] = item;
             Count++;
-
         }
 
-        void ShiftingToLeft(int index)
-        {
-            for (int i = index; i < currentIndex - 1; i++)
-            {
-                items[i] = items[i + 1];
-            }
-        }
-        void ShiftingToRight(int index)
-        {
-            for (int i = currentIndex; i > index; i--)
-            {
-                items[i] = items[i - 1];
-            }
-        }
-        public void RemoveAt(int index)
-        {
-            if (index < 0 || index >= currentIndex)
-                throw new ArgumentOutOfRangeException(nameof(index));
-            ShiftingToLeft(index);
-            Count--;
-            currentIndex--;
-            items[Count] = default(T);
-        }
-
-        public int IndexOf(T item)
-        {
-            for (int i = 0; i < currentIndex; i++)
-            {
-                if (EqualityComparer<T>.Default.Equals(items[i], item))
-                    return i;
-            }
-            return -1;
-        }
-
-        public bool Remove(T item)
-        {
-            int index = IndexOf(item);
-
-            if (index == -1)
-                return false;
-
-            ShiftingToLeft(index);
-
-            Count--;
-            currentIndex--;
-
-            items[Count] = default(T);
-            return true;
-        }
-
+        // Adds multiple elements to the end of the list
         public void AddRange(T[] elements)
         {
-            ResizeTo(Count + elements.Length);
+            if (elements == null)
+                throw new ArgumentNullException(nameof(elements));
+
+            EnsureCapacity(Count + elements.Length);
 
             for (int i = 0; i < elements.Length; i++)
             {
                 items[Count + i] = elements[i];
             }
+
             Count += elements.Length;
-            currentIndex += elements.Length;
         }
 
-        public void RemoveRange(int index, int count)
-        {
-            if (index < 0 || index >= Count)
-                throw new IndexOutOfRangeException();
+        #endregion
 
-            if (count < 0 || index + count > Count)
-                throw new ArgumentOutOfRangeException(nameof(count));
+        #region Insert Operations
 
-            for (int i = index; i < currentIndex - count; i++)
-            {
-                items[i] = items[i + count];
-            }
-
-            for (int i = currentIndex - count; i < currentIndex; i++)
-            {
-                items[i] = default(T);
-            }
-
-            currentIndex -= count;
-            Count -= count;
-            if (Count > 0 && Count <= items.Length / 4)
-            {
-                int newSize = items.Length / 2;
-
-                if (newSize < 4)
-                    newSize = 4;
-
-                ResizeTo(newSize);
-            }
-
-        }
-
-
+        // Inserts a single element at a specific index
         public void Insert(int index, T item)
-        {
-            if (index > Count || index < 0)
-                throw new ArgumentOutOfRangeException(nameof(index));
-            if (Count + 1 > items.Length)
-            {
-                items = Resize(items);
-            }
-            ShiftingToRight(index);
-            items[index] = item;
-            Count++;
-            currentIndex++;
-
-        }
-        public void InsertRange(int index, T[] values)
         {
             if (index < 0 || index > Count)
                 throw new ArgumentOutOfRangeException(nameof(index));
 
-            ResizeTo(Count + values.Length);
+            EnsureCapacity(Count + 1);
 
-            for (int i = currentIndex - 1; i >= index; i--)
+            ShiftRight(index);
+
+            items[index] = item;
+
+            Count++;
+        }
+
+        // Inserts multiple elements starting from a specific index
+        public void InsertRange(int index, T[] values)
+        {
+            if (values == null)
+                throw new ArgumentNullException(nameof(values));
+
+            if (index < 0 || index > Count)
+                throw new ArgumentOutOfRangeException(nameof(index));
+
+            EnsureCapacity(Count + values.Length);
+
+            for (int i = Count - 1; i >= index; i--)
             {
                 items[i + values.Length] = items[i];
             }
@@ -240,57 +153,214 @@ namespace gnericList
             }
 
             Count += values.Length;
-            currentIndex += values.Length;
         }
 
-        public T[] ToArray()
+        #endregion
+
+        #region Remove Operations
+
+        // Removes element at a specific index
+        public void RemoveAt(int index)
         {
-            T[] newArrar = new T[Count];
-            Array.Copy(items, newArrar, Count);
-            return newArrar;
+            ValidateIndex(index);
 
+            ShiftLeft(index);
+
+            Count--;
+
+            items[Count] = default(T);
+
+            ShrinkIfNeeded();
         }
+
+        // Removes the first matching element from the list
+        public bool Remove(T item)
+        {
+            int index = IndexOf(item);
+
+            if (index == -1)
+                return false;
+
+            RemoveAt(index);
+
+            return true;
+        }
+
+        // Removes a range of elements starting from a specific index
+        public void RemoveRange(int index, int count)
+        {
+            if (index < 0 || index >= Count)
+                throw new ArgumentOutOfRangeException(nameof(index));
+
+            if (count < 0 || index + count > Count)
+                throw new ArgumentOutOfRangeException(nameof(count));
+
+            for (int i = index; i < Count - count; i++)
+            {
+                items[i] = items[i + count];
+            }
+
+            for (int i = Count - count; i < Count; i++)
+            {
+                items[i] = default(T);
+            }
+
+            Count -= count;
+
+            ShrinkIfNeeded();
+        }
+
+        // Removes all elements and resets the list
         public void Clear()
         {
             items = new T[4];
             Count = 0;
-            currentIndex = 0;
         }
-        public void RemoveAll()
+
+        #endregion
+
+        #region Search Operations
+
+        // Returns the index of the first matching element
+        public int IndexOf(T item)
         {
             for (int i = 0; i < Count; i++)
             {
-                items[i] = default(T);
+                if (EqualityComparer<T>.Default.Equals(items[i], item))
+                    return i;
             }
+
+            return -1;
         }
 
+        // Checks whether the list contains a specific element
+        public bool Contains(T item)
+        {
+            return IndexOf(item) != -1;
+        }
 
+        #endregion
 
+        #region Utility Operations
+
+        // Reverses the order of active list elements
         public void Reverse()
         {
-            T[] reversed = ToArray().Reverse().ToArray();
+            int left = 0;
+            int right = Count - 1;
+
+            while (left < right)
+            {
+                T temp = items[left];
+                items[left] = items[right];
+                items[right] = temp;
+
+                left++;
+                right--;
+            }
+        }
+
+        // Returns a new array containing active elements only
+        public T[] ToArray()
+        {
+            T[] result = new T[Count];
+
+            Array.Copy(items, result, Count);
+
+            return result;
+        }
+
+        #endregion
+
+        #region Internal Helper Methods
+
+        // Validates index boundaries before accessing elements
+        private void ValidateIndex(int index)
+        {
+            if (index < 0 || index >= Count)
+                throw new ArgumentOutOfRangeException(nameof(index));
+        }
+
+        // Ensures the internal array has enough storage capacity
+        private void EnsureCapacity(int requiredCapacity)
+        {
+            if (items.Length >= requiredCapacity)
+                return;
+
+            int newCapacity = items.Length == 0 ? 4 : items.Length * 2;
+
+            while (newCapacity < requiredCapacity)
+            {
+                newCapacity *= 2;
+            }
+
+            ResizeTo(newCapacity);
+        }
+
+        // Resizes the internal array to a specific capacity
+        private void ResizeTo(int newCapacity)
+        {
+            T[] newArray = new T[newCapacity];
 
             for (int i = 0; i < Count; i++)
             {
-                items[i] = reversed[i];
+                newArray[i] = items[i];
+            }
+
+            items = newArray;
+        }
+
+        // Shrinks array size when usage becomes very low
+        private void ShrinkIfNeeded()
+        {
+            if (Count <= items.Length / 4 && items.Length > 4)
+            {
+                int newCapacity = items.Length / 2;
+
+                if (newCapacity < 4)
+                    newCapacity = 4;
+
+                ResizeTo(newCapacity);
             }
         }
 
+        // Shifts elements to the left after deletion
+        private void ShiftLeft(int index)
+        {
+            for (int i = index; i < Count - 1; i++)
+            {
+                items[i] = items[i + 1];
+            }
+        }
+
+        // Shifts elements to the right before insertion
+        private void ShiftRight(int index)
+        {
+            for (int i = Count; i > index; i--)
+            {
+                items[i] = items[i - 1];
+            }
+        }
+
+        #endregion
+
+        #region Enumeration Support
+
+        // Enables foreach iteration over active elements only
         public IEnumerator<T> GetEnumerator()
         {
-            foreach (T item in items)
+            for (int i = 0; i < Count; i++)
             {
-                yield return item;
+                yield return items[i];
             }
         }
 
+        // Non-generic enumerator implementation
         IEnumerator IEnumerable.GetEnumerator()
         {
             return GetEnumerator();
         }
+
         #endregion
-
-
-
     }
 }
