@@ -248,7 +248,19 @@ namespace gnericList
             return newArrar;
 
         }
-
+        public void Clear()
+        {
+            items = new T[4];
+            Count = 0;
+            currentIndex = 0;
+        }
+        public void RemoveAll()
+        {
+            for (int i = 0; i < Count; i++)
+            {
+                items[i] = default(T);
+            }
+        }
         #endregion
 
 
