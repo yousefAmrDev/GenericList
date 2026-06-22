@@ -241,7 +241,13 @@ namespace gnericList
             currentIndex += values.Length;
         }
 
+        public T[] ToArray()
+        {
+            T[] newArrar = new T[Count];
+            Array.Copy(items, newArrar, Count);
+            return newArrar;
 
+        }
 
         #endregion
 
