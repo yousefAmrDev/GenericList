@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace gnericList
 {
@@ -259,6 +260,18 @@ namespace gnericList
             for (int i = 0; i < Count; i++)
             {
                 items[i] = default(T);
+            }
+        }
+
+
+
+        public void Reverse()
+        {
+            T[] reversed = ToArray().Reverse().ToArray();
+
+            for (int i = 0; i < Count; i++)
+            {
+                items[i] = reversed[i];
             }
         }
         #endregion
