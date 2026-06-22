@@ -86,6 +86,20 @@ namespace gnericList
 
             return Arr2;
         }
+        private void ResizeTo(int requiredCapacity)
+        {
+            if (items.Length >= requiredCapacity)
+                return;
+
+            T[] newArr = new T[requiredCapacity];
+
+            for (int i = 0; i < items.Length; i++)
+            {
+                newArr[i] = items[i];
+            }
+
+            items = newArr;
+        }
         public void Add(T item)
         {
             if (currentIndex >= items.Length)
@@ -101,10 +115,10 @@ namespace gnericList
         {
             for (int i = index; i < currentIndex - 1; i++)
             {
-
                 items[i] = items[i + 1];
             }
         }
+
         public void RemoveAt(int index)
         {
             if (index < 0 || index >= currentIndex)
@@ -141,20 +155,51 @@ namespace gnericList
             return true;
         }
 
-        public void AddRenge(T[] elements)
+        public void AddRange(T[] elements)
         {
-            int temp = 0;
-            while (Count + elements.Length > items.Length)
+            ResizeTo(Count + elements.Length);
+
+            for (int i = 0; i < elements.Length; i++)
             {
-                Resize(items);
+                items[Count + i] = elements[i];
+            }
+            Count += elements.Length;
+            currentIndex += elements.Length;
+        }
+
+        public void RemoveRange(int index, int count)
+        {
+            if (index < 0 || index >= Count)
+                throw new IndexOutOfRangeException();
+
+            if (count < 0 || index + count > Count)
+                throw new ArgumentOutOfRangeException(nameof(count));
+
+            for (int i = index; i < currentIndex - count; i++)
+            {
+                items[i] = items[i + count];
             }
 
-            for (int i = Count; i < Count + elements.Length; i++)
+            for (int i = currentIndex - count; i < currentIndex; i++)
             {
-                items[i] = elements[temp];
-                temp++;
+                items[i] = default(T);
             }
+
+            currentIndex -= count;
+            Count -= count;
+            if (Count > 0 && Count <= items.Length / 4)
+            {
+                int newSize = items.Length / 2;
+
+                if (newSize < 4)
+                    newSize = 4;
+
+                ResizeTo(newSize);
+            }
+
         }
+
+
         #endregion
 
 
