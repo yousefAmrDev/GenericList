@@ -220,6 +220,28 @@ namespace gnericList
             currentIndex++;
 
         }
+        public void InsertRange(int index, T[] values)
+        {
+            if (index < 0 || index > Count)
+                throw new ArgumentOutOfRangeException(nameof(index));
+
+            ResizeTo(Count + values.Length);
+
+            for (int i = currentIndex - 1; i >= index; i--)
+            {
+                items[i + values.Length] = items[i];
+            }
+
+            for (int i = 0; i < values.Length; i++)
+            {
+                items[index + i] = values[i];
+            }
+
+            Count += values.Length;
+            currentIndex += values.Length;
+        }
+
+
 
         #endregion
 
