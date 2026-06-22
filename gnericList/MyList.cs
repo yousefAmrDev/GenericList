@@ -118,7 +118,13 @@ namespace gnericList
                 items[i] = items[i + 1];
             }
         }
-
+        void ShiftingToRight(int index)
+        {
+            for (int i = currentIndex; i > index; i--)
+            {
+                items[i] = items[i - 1];
+            }
+        }
         public void RemoveAt(int index)
         {
             if (index < 0 || index >= currentIndex)
@@ -199,6 +205,21 @@ namespace gnericList
 
         }
 
+
+        public void Insert(int index, T item)
+        {
+            if (index > Count || index < 0)
+                throw new ArgumentOutOfRangeException(nameof(index));
+            if (Count + 1 > items.Length)
+            {
+                items = Resize(items);
+            }
+            ShiftingToRight(index);
+            items[index] = item;
+            Count++;
+            currentIndex++;
+
+        }
 
         #endregion
 
